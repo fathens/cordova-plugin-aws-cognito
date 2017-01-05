@@ -8,7 +8,7 @@
         <engine name="cordova-android" version=">=6.0.0" />
         <engine name="cordova-ios" version=">=4.3.0" />
     </engines>
-    
+
     <preference name="AWS_COGNITO_PROVIDERS" />
 
     <js-module name="AWSS3Plugin" src="www/cognito.js">
@@ -21,6 +21,8 @@
         <config-file target="AndroidManifest.xml" parent="application">
             <meta-data android:name="org.fathens.aws.cognito.providers" android:value="AWS_COGNITO_PROVIDERS"/>
         </config-file>
+
+        <source-file src="platforms/android/src/main/kotlin/AwsCognito.kt" target-dir="kotlin/org.fathens.cordova.plugin.aws"/>
 
         <framework src="platforms/android/plugin.gradle" custom="true" type="gradleReference"/>
 
@@ -35,4 +37,3 @@
         </podfile>
     </platform>
 </plugin>
-
