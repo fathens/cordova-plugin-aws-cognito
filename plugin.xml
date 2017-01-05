@@ -30,6 +30,15 @@
     </platform>
 
     <platform name="ios">
+        <config-file parent="/*" target="config.xml">
+            <feature name="AWSCognitoPlugin">
+                <param name="ios-package" value="AwsCognito"/>
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <source-file src="platforms/ios/src/AwsCognito.swift"/>
+
         <hook type="after_prepare" src="platforms/ios/hooks/after_prepare.rb"/>
 
         <podfile swift_version="3.0">
