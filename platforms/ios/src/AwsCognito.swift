@@ -20,44 +20,50 @@ class AwsCognito: CDVPlugin {
         fork(command) {
             let service = self.getString(0)
             let token = self.getString(1)
-            self.withLogins({ provider in
-                let logins = provider.logins
-                provider.logins = logins
+            self.withLogins { provider, logins in
+                if logins.keys.contains(service) {
+                    log("No need to add '\(service)', already contains")
+                } else {
+                    var tokens = logins
+                    tokens[service] = token
+                    self.updateLogins(tokens)
+                }
                 self.success()
-            })
+            }
         }
     }
     
     func removeToken(_ command: CDVInvokedUrlCommand) {
         fork(command) {
             let service = self.getString(0)
-            self.success()
+            self.withLogins { provider, logins in
+                if logins.keys.contains(service) {
+                    var tokens = logins
+                    tokens.removeValue(forKey: service)
+                    self.updateLogins(tokens)
+                } else {
+                    log("No need to remove '\(service)', not contains")
+                }
+                self.success()
+            }
         }
     }
-
-    // MARK: - Private Impl
     
+    // MARK: - Private Utillities
+
     private func success() {
-        withLogins({ provider in
+        withLogins { provider, logins in
             if let id = provider.identityId {
                 self.finish_ok([
                     "identityId": id,
-                    "services": provider.logins.keys
+                    "services": Array(logins.keys)
                 ])
             } else {
                 self.finish_error("No IdentityId yet.")
             }
-        })
-    }
-    
-    private func withLogins(_ callback: @escaping ((_ provider: AWSCognitoCredentialsProvider) -> Void)) {
-        if let cognito = AWSServiceManager.default().defaultServiceConfiguration.credentialsProvider as? AWSCognitoCredentialsProvider {
-            callback(cognito)
-        } else {
-            self.finish_error("No Cognito Identity Provider")
         }
     }
-
+    
     private func withTask<T>(_ task: AWSTask<T>, _ callback: ((_ res: T) -> Void)? = nil) {
         task.continue({ task in
             if let error = task.error {
@@ -76,11 +82,36 @@ class AwsCognito: CDVPlugin {
             return nil
         })
     }
-
-    // MARK: - Private Utillities
-
+    
     private var currentCommand: CDVInvokedUrlCommand?
     
+    private func withLogins(_ callback: @escaping ((_ provider: AWSCognitoCredentialsProviderHelperProtocol, _ logins: [String : String]) -> Void)) {
+        if let cognito = AWSServiceManager.default().defaultServiceConfiguration.credentialsProvider as? AWSCognitoCredentialsProvider {
+            let provider = cognito.identityProvider
+            withTask(provider.logins()) { logins in
+                let tokens = NSDictionary(dictionary: logins)
+                callback(provider, tokens as! [String : String])
+            }
+        } else {
+            self.finish_error("No Cognito Identity Provider")
+        }
+    }
+    
+    lazy private var infoDict: [String : String]? = Bundle.main.infoDictionary?["CordovaAWS"] as? [String : String]
+    
+    private func updateLogins(_ tokens: [String : String]) {
+        let manager = LoginsIdentityProvider(tokens)
+        if let regionName = self.infoDict?["Region"], let poolId = self.infoDict?["CognitoPool"] {
+            let region = regionName.aws_regionTypeValue()
+            let provider = AWSCognitoCredentialsProvider.init(regionType: region, identityPoolId: poolId, identityProviderManager: manager)
+            let config = AWSServiceConfiguration.init(region: region, credentialsProvider: provider)
+            AWSServiceManager.default().defaultServiceConfiguration = config
+            log("AWSServiceManager is changed: logins=\(manager.tokens)")
+        } else {
+            self.finish_error("Not configured: Region and CognitoPool")
+        }
+    }
+
     private func getString(_ index: UInt) -> String {
         return currentCommand!.argument(at: index) as! String
     }
@@ -122,3 +153,14 @@ class AwsCognito: CDVPlugin {
         }
     }
 }
+
+fileprivate class LoginsIdentityProvider: NSObject, AWSIdentityProviderManager {
+    var tokens : [String : String] = [:]
+    init(_ tokens: [String : String]) {
+        self.tokens = tokens
+    }
+    @objc func logins() -> AWSTask<NSDictionary> {
+        return AWSTask(result: NSDictionary(dictionary: tokens))
+    }
+}
+
