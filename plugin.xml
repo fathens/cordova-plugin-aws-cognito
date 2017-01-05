@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="org.fathens.cordova.plugin.aws.Cognito" version="0.0.1" xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>Fabric</name>
+    <description>Cordova Plugin for AWS Cognito</description>
+    <license>MIT</license>
+
+    <engines>
+        <engine name="cordova-android" version=">=6.0.0" />
+        <engine name="cordova-ios" version=">=4.3.0" />
+    </engines>
+    
+    <preference name="AWS_COGNITO_PROVIDERS" />
+
+    <js-module name="AWSS3Plugin" src="www/cognito.js">
+        <clobbers target="plugin.AWS.Cognito"/>
+    </js-module>
+
+    <dependency id="org.fathens.cordova.plugin.aws.Base" url="https://github.com/fathens/Cordova-Plugin-AWS_Base.git" commit="master" />
+
+    <platform name="android">
+        <config-file target="AndroidManifest.xml" parent="application">
+            <meta-data android:name="org.fathens.aws.cognito.providers" android:value="AWS_COGNITO_PROVIDERS"/>
+        </config-file>
+
+        <framework src="platforms/android/plugin.gradle" custom="true" type="gradleReference"/>
+
+        <hook type="after_prepare" src="platforms/android/hooks/after_prepare.rb"/>
+    </platform>
+
+    <platform name="ios">
+        <hook type="after_prepare" src="platforms/ios/hooks/after_prepare.rb"/>
+
+        <podfile swift_version="3.0">
+            <pod name="AWSS3" />
+        </podfile>
+    </platform>
+</plugin>
+
