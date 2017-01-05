@@ -16,6 +16,12 @@
     <dependency id="org.fathens.cordova.plugin.aws.Base" url="https://github.com/fathens/Cordova-Plugin-AWS_Base.git" commit="master" />
 
     <platform name="android">
+        <config-file parent="/*" target="res/xml/config.xml">
+            <feature name="AWSCognitoPlugin">
+                <param name="android-package" value="org.fathens.cordova.plugin.aws.AwsCognito"/>
+            </feature>
+        </config-file>
+
         <source-file src="platforms/android/src/main/kotlin/AwsCognito.kt" target-dir="kotlin/org.fathens.cordova.plugin.aws"/>
 
         <framework src="platforms/android/plugin.gradle" custom="true" type="gradleReference"/>
