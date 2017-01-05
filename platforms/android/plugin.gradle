@@ -1,0 +1,3 @@
+dependencies {
+    compile 'com.amazonaws:aws-android-sdk-cognitoidentityprovider:2.2.+'
+}
