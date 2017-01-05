@@ -11,7 +11,7 @@
 
     <preference name="AWS_COGNITO_PROVIDERS" />
 
-    <js-module name="AWSS3Plugin" src="www/cognito.js">
+    <js-module name="AWSCognitoPlugin" src="www/cognito.js">
         <clobbers target="plugin.AWS.Cognito"/>
     </js-module>
 
