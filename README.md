@@ -1,0 +1,1 @@
+# Cordova-Plugin-AWS_Cognito
