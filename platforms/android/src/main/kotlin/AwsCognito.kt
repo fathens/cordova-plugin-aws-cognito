@@ -88,6 +88,10 @@ public class AwsCognito : CordovaPlugin() {
         success()
     }
 
+    fun removeCustomToken(args: JSONArray) {
+        removeToken(JSONArray(listOf(customProviderId)))
+    }
+
     // private Impl
 
     fun success() {
