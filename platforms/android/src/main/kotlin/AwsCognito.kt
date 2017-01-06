@@ -64,9 +64,11 @@ public class AwsCognito : CordovaPlugin() {
         val token = args.getString(1)
 
         val logins = credentialProvider.logins
-        logins.put(service, token)
-        credentialProvider.logins = logins
-        credentialProvider.refresh()
+        if (!logins.containsKey(service)) {
+            logins.put(service, token)
+            credentialProvider.logins = logins
+            credentialProvider.refresh()
+        }
         success()
     }
 
@@ -74,9 +76,11 @@ public class AwsCognito : CordovaPlugin() {
         val service = args.getString(0)
 
         val logins = credentialProvider.logins
-        logins.remove(service)
-        credentialProvider.logins = logins
-        credentialProvider.refresh()
+        if (logins.containsKey(service)) {
+            logins.remove(service)
+            credentialProvider.logins = logins
+            credentialProvider.refresh()
+        }
         success()
     }
 
