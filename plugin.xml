@@ -25,8 +25,6 @@
         <source-file src="platforms/android/src/main/kotlin/AwsCognito.kt" target-dir="kotlin/org.fathens.cordova.plugin.aws"/>
 
         <framework src="platforms/android/plugin.gradle" custom="true" type="gradleReference"/>
-
-        <hook type="after_prepare" src="platforms/android/hooks/after_prepare.rb"/>
     </platform>
 
     <platform name="ios">
@@ -37,8 +35,6 @@
         </config-file>
 
         <source-file src="platforms/ios/src/AwsCognito.swift"/>
-
-        <hook type="after_prepare" src="platforms/ios/hooks/after_prepare.rb"/>
 
         <podfile swift_version="3.0">
             <pod name="AWSCore" version="~> 2.4.16" />
