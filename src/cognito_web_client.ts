@@ -97,4 +97,12 @@ export class CognitoWebClient extends CognitoClient {
             logger.info(() => `Nothing to do, since not signed in: ${service}`);
         }
     }
+    
+    async setCustomToken(id: string, token: string): Promise<CognitoIdentity> {
+        
+    }
+    
+    async removeCustomToken(): Promise<CognitoIdentity> {
+        
+    }
 }

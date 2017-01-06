@@ -32,4 +32,12 @@ export class Cognito extends CognitoClient {
     removeToken(service: string): Promise<CognitoIdentity> {
         return this.client.removeToken(service);
     }
+    
+    setCustomToken(id: string, token: string): Promise<CognitoIdentity> {
+        return this.client.setCustomToken(id, token);
+    }
+    
+    removeCustomToken(): Promise<CognitoIdentity> {
+        return this.client.removeCustomToken();
+    }
 }
