@@ -75,10 +75,11 @@ export class CognitoWebClient extends CognitoClient {
 
     async setToken(service: string, token: string): Promise<CognitoIdentity> {
         logger.info(() => `SignIn: ${service}`);
-        const p = getCredentials().params;
-        if (_.has(p.Logins, service)) {
+        const current = await this.identity;
+        if (_.includes(current.services, service)) {
             logger.info(() => `Nothing to do, since already signed in: ${service}`);
         } else {
+            const p = getCredentials().params;
             if (_.isEmpty(p.Logins)) p.Logins = {};
             p.Logins[service] = token;
             p.IdentityId = null;
@@ -88,8 +89,9 @@ export class CognitoWebClient extends CognitoClient {
 
     async removeToken(service: string): Promise<CognitoIdentity> {
         logger.info(() => `SignOut: ${service}`);
-        const p = getCredentials().params;
-        if (_.has(p.Logins, service)) {
+        const current = await this.identity;
+        if (_.includes(current.services, service)) {
+            const p = getCredentials().params;
             delete p.Logins[service];
             p.IdentityId = null;
             return await this.refresh();
