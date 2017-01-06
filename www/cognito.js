@@ -1,6 +1,6 @@
 var cordova = require("cordova/exec");
 
-var pluginName = "AWSCognitoPlugin"
+var pluginName = "AWSCognitoPlugin";
 
 var names = [
 "getIdentity",
@@ -16,7 +16,7 @@ names.forEach(function(methodName) {
         return new Promise(function(resolve, reject) {
             cordova(resolve, reject, pluginName, methodName, args);
         });
-    }
+    };
 });
 
 module.exports = obj;
