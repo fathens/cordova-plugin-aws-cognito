@@ -5,7 +5,9 @@ var pluginName = "AWSCognitoPlugin";
 var names = [
 "getIdentity",
 "setToken",
-"removeToken"
+"removeToken",
+"setCustomToken",
+"removeCustomToken"
 ];
 
 var obj = {};
