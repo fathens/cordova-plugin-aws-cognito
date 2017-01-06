@@ -25,6 +25,10 @@ public class AwsCognito : CordovaPlugin() {
         cordova.activity.packageManager.getApplicationInfo(cordova.activity.packageName, GET_META_DATA).metaData
     }
 
+    private val customProviderId: String by lazy {
+        metaData.getString("org.fathens.aws.cognito.customProvider")
+    }
+
     private val credentialProvider: CognitoCachingCredentialsProvider by lazy {
         CognitoCachingCredentialsProvider(
                 cordova.activity.applicationContext,
