@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-awscognito",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Cordova Plugin for AWS Cognito",
   "main": "dist/index.js",
   "typings": "dist/index",
