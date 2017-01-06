@@ -81,9 +81,11 @@ export class CognitoWebClient extends CognitoClient {
             return current;
         } else {
             const p = getCredentials().params;
-            if (_.isEmpty(p.Logins)) p.Logins = {};
+            if (_.isEmpty(p.Logins)) {
+                p.Logins = {};
+                p.IdentityId = null;
+            }
             p.Logins[service] = token;
-            p.IdentityId = null;
             return await this.refresh();
         }
     }
@@ -94,7 +96,7 @@ export class CognitoWebClient extends CognitoClient {
         if (_.includes(current.services, service)) {
             const p = getCredentials().params;
             delete p.Logins[service];
-            p.IdentityId = null;
+            if (_.isEmpty(p.Logins)) p.IdentityId = null;
             return await this.refresh();
         } else {
             logger.info(() => `Nothing to do, since not signed in: ${service}`);
