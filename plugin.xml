@@ -33,7 +33,6 @@
         <config-file parent="/*" target="config.xml">
             <feature name="AWSCognitoPlugin">
                 <param name="ios-package" value="AwsCognito"/>
-                <param name="onload" value="true" />
             </feature>
         </config-file>
 
