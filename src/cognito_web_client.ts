@@ -1,11 +1,13 @@
 import _ from "lodash";
 import { Logger } from "log4ts";
+import { aws_request } from "cordova-plugin-aws";
 
 import { Cognito } from "./cognito";
 import { CognitoClient, CognitoIdentity } from "./cognito_client";
 
 const logger = new Logger("Cognito");
 
+declare const AWS_COGNITO_POOL_ID;
 declare const AWS_COGNITO_CUSTOM_PROVIDER_ID;
 const AWS = (window as any).AWS;
 
@@ -105,10 +107,49 @@ export class CognitoWebClient extends CognitoClient {
     }
     
     async setCustomToken(userId: string): Promise<CognitoIdentity> {
-        return this.setToken(AWS_COGNITO_CUSTOM_PROVIDER_ID, userId);
+        const current = await this.identity;
+        if (_.includes(current.services, AWS_COGNITO_CUSTOM_PROVIDER_ID)) {
+            logger.info(() => `Nothing to do, since already signed in: ${AWS_COGNITO_CUSTOM_PROVIDER_ID}`);
+            return current;
+        } else {
+            const p = getCredentials().params;
+            const logins = _.clone(p.Logins || {});
+            logins[AWS_COGNITO_CUSTOM_PROVIDER_ID] = userId;
+            
+            const params: ServerRequest = {
+                IdentityPoolId: AWS_COGNITO_POOL_ID,
+                IdentityId: _.isEmpty(p.Logins) ? null : p.IdentityId,
+                Logins: logins
+            }
+            
+            const ci = new AWS.CognitoIdentity();
+            const res = await aws_request<ServerResult>(ci.getOpenIdTokenForDeveloperIdentity(params));
+            
+            logins[AWS_COGNITO_CUSTOM_PROVIDER_ID] = res.Token;
+            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                IdentityPoolId: AWS_COGNITO_POOL_ID,
+                IdentityId: res.IdentityId,
+                Logins: logins
+            });
+            return {
+                identityId: res.IdentityId,
+                services: _.keys(logins)
+            };
+        }
     }
     
     async removeCustomToken(): Promise<CognitoIdentity> {
         return this.removeToken(AWS_COGNITO_CUSTOM_PROVIDER_ID);
     }
+}
+
+type ServerResult = {
+    IdentityId: string,
+    Token: string
+}
+
+type ServerRequest = {
+    IdentityPoolId: string,
+    IdentityId: string | null,
+    Logins: { [key: string]: string }
 }
