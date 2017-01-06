@@ -48,7 +48,10 @@ export class CognitoWebClient extends CognitoClient {
                     logger.info(() => `Cognito refresh success`);
                     try {
                         const cred = getCredentials();
-                        const newId = new CognitoIdentity(cred.identityId, cred.params.Logins);
+                        const newId: CognitoIdentity = {
+                            identityId: cred.identityId,
+                            services: _.keys(cred.params.Logins)
+                        };
                         logger.debug(() => `Created CognitoIdentity: ${newId}`);
                         if (!_.isNil(oldId)) {
                             await Promise.all(Cognito.changedHooks.map(async (hook) => {

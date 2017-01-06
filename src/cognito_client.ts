@@ -10,23 +10,7 @@ export abstract class CognitoClient {
     abstract removeToken(service: string): Promise<CognitoIdentity>;
 }
 
-
-export class CognitoIdentity {
-    constructor(private id: string, logins: { [key: string]: string; }) {
-        this.services = _.keys(logins);
-    }
-    
-    private services: string[];
-
-    toString(): string {
-        return `Cognito(identityId: ${this.id}, services: [${this.services.join(", ")}])`;
-    }
-
-    get identityId(): string {
-        return this.id;
-    }
-
-    isJoin(name: string): boolean {
-        return _.includes(this.services, name);
-    }
+export type CognitoIdentity = {
+    identityId: string,
+    services: string[]
 }
