@@ -9,6 +9,8 @@
         <engine name="cordova-ios" version=">=4.3.0" />
     </engines>
 
+    <preference name="AWS_COGNITO_CUSTOM_PROVIDER_ID" />
+
     <js-module name="AWSCognitoPlugin" src="www/cognito.js">
         <clobbers target="plugin.AWS.Cognito"/>
     </js-module>
@@ -16,6 +18,10 @@
     <dependency id="org.fathens.cordova.plugin.aws.lambda" url="https://github.com/fathens/cordova-plugin-aws-lambda.git" commit="master" />
 
     <platform name="android">
+        <config-file target="AndroidManifest.xml" parent="application">
+            <meta-data android:name="org.fathens.aws.s3.bucket" android:value="AWS_COGNITO_CUSTOM_PROVIDER_ID"/>
+        </config-file>
+
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="AWSCognitoPlugin">
                 <param name="android-package" value="org.fathens.cordova.plugin.aws.AwsCognito"/>
@@ -28,6 +34,13 @@
     </platform>
 
     <platform name="ios">
+        <config-file target="*-Info.plist" parent="CordovaAWS">
+            <dict>
+                <key>S3BucketName</key>
+                <string>AWS_COGNITO_CUSTOM_PROVIDER_ID</string>
+            </dict>
+        </config-file>
+
         <config-file parent="/*" target="config.xml">
             <feature name="AWSCognitoPlugin">
                 <param name="ios-package" value="AwsCognito"/>

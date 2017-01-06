@@ -7,6 +7,7 @@ import { CognitoClient, CognitoIdentity } from "./cognito_client";
 const logger = new Logger("Cognito");
 
 declare const AWS_COGNITO_POOL_ID;
+declare const AWS_COGNITO_CUSTOM_PROVIDER_ID;
 const AWS = (window as any).AWS;
 
 function getCredentials(): CognitoIdentityCredentials {
