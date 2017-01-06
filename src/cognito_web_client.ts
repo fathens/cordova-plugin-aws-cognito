@@ -102,8 +102,8 @@ export class CognitoWebClient extends CognitoClient {
         }
     }
     
-    async setCustomToken(token: string): Promise<CognitoIdentity> {
-        return this.setToken(AWS_COGNITO_CUSTOM_PROVIDER_ID, token);
+    async setCustomToken(userId: string): Promise<CognitoIdentity> {
+        return this.setToken(AWS_COGNITO_CUSTOM_PROVIDER_ID, userId);
     }
     
     async removeCustomToken(): Promise<CognitoIdentity> {
