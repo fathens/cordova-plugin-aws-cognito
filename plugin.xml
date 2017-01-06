@@ -36,7 +36,7 @@
     <platform name="ios">
         <config-file target="*-Info.plist" parent="CordovaAWS">
             <dict>
-                <key>S3BucketName</key>
+                <key>CognitoCustomProvider</key>
                 <string>AWS_COGNITO_CUSTOM_PROVIDER_ID</string>
             </dict>
         </config-file>
