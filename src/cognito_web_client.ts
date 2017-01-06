@@ -78,6 +78,7 @@ export class CognitoWebClient extends CognitoClient {
         const current = await this.identity;
         if (_.includes(current.services, service)) {
             logger.info(() => `Nothing to do, since already signed in: ${service}`);
+            return current;
         } else {
             const p = getCredentials().params;
             if (_.isEmpty(p.Logins)) p.Logins = {};
@@ -97,6 +98,7 @@ export class CognitoWebClient extends CognitoClient {
             return await this.refresh();
         } else {
             logger.info(() => `Nothing to do, since not signed in: ${service}`);
+            return current;
         }
     }
     
