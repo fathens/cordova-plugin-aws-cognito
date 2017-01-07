@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { Logger } from "log4ts";
 import { aws_request } from "cordova-plugin-aws";
+import { Lambda } from "cordova-plugin-awslambda";
 
 import { Cognito } from "./cognito";
 import { CognitoClient, CognitoIdentity } from "./cognito_client";
@@ -107,7 +108,7 @@ export class CognitoWebClient extends CognitoClient {
             return current;
         }
     }
-    
+
     async setCustomToken(userId: string): Promise<CognitoIdentity> {
         const current = await this.identity;
         if (_.includes(current.services, AWS_COGNITO_CUSTOM_PROVIDER_ID)) {
@@ -129,7 +130,7 @@ export class CognitoWebClient extends CognitoClient {
             services: _.keys(logins)
         };
     }
-    
+
     async removeCustomToken(userId: string): Promise<CognitoIdentity> {
         const current = await this.identity;
         if (!_.includes(current.services, AWS_COGNITO_CUSTOM_PROVIDER_ID)) {
@@ -152,15 +153,6 @@ type ServerRequest = {
     Logins: { [key: string]: string }
 }
 
-type LambdaRequest = {
-    FunctionName: string,
-    Payload: Object,
-    ClientContext?: string, // Base64 encoded JSON
-    InvocationType?: "Event" | "RequestResponse" | "DryRun",
-    LogType?: "None" | "Tail",
-    Qualifier?: string
-}
-
 class AuthServer {
     static async add(userId: string): Promise<ServerResult> {
         const p = getCredentials().params;
@@ -173,30 +165,17 @@ class AuthServer {
         }
         if (!_.isEmpty(p.Logins)) params.IdentityId = p.IdentityId;
 
-        return this.invoke<ServerResult>(params);
+        return new Lambda().invoke<ServerRequest, ServerResult>(AWS_COGNITO_CUSTOM_PROVIDER_LAMBDA, params);
     }
 
     static async remove(userId: string): Promise<void> {
         const p = getCredentials().params;
 
-        await this.invoke({
+        await new Lambda().invoke(AWS_COGNITO_CUSTOM_PROVIDER_LAMBDA, {
             IdentityId: p.IdentityId,
             IdentityPoolId: AWS_COGNITO_POOL_ID,
             DeveloperProviderName: AWS_COGNITO_CUSTOM_PROVIDER_ID,
             DeveloperUserIdentifier: userId
         });
-    }
-
-    private static invoke<T>(payload): Promise<T> {
-        const splited = AWS_COGNITO_CUSTOM_PROVIDER_LAMBDA.split(':');
-
-        const params: LambdaRequest = {
-            FunctionName: splited[0],
-            Payload: payload
-        };
-        if (splited.length > 1) params.Qualifier = splited[1];
-
-        const lambda = new AWS.Lambda();
-        return aws_request<T>(lambda.invoke(params));
     }
 }
