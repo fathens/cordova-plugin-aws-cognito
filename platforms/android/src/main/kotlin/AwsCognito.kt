@@ -29,11 +29,19 @@ public class AwsCognito : CordovaPlugin() {
         metaData.getString("org.fathens.aws.cognito.customProvider")
     }
 
+    private val identityPoolId: String by lazy {
+        metaData.getString("org.fathens.aws.cognito.identityPool")
+    }
+
+    private val region: Regions by lazy {
+        Regions.fromName(metaData.getString("org.fathens.aws.region"))
+    }
+
     private val credentialProvider: CognitoCachingCredentialsProvider by lazy {
         CognitoCachingCredentialsProvider(
                 cordova.activity.applicationContext,
-                metaData.getString("org.fathens.aws.cognito.identityPool"),
-                Regions.fromName(metaData.getString("org.fathens.aws.region")))
+                identityPoolId,
+                region)
     }
 
     override fun execute(action: String, args: JSONArray, callbackContext: CallbackContext): Boolean {
