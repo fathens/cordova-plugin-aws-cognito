@@ -8,7 +8,9 @@ import { CognitoClient, CognitoIdentity } from "./cognito_client";
 const logger = new Logger("Cognito");
 
 declare const AWS_COGNITO_POOL_ID;
-declare const AWS_COGNITO_CUSTOM_PROVIDER_ID;
+declare const AWS_COGNITO_CUSTOM_PROVIDER;
+const AWS_COGNITO_CUSTOM_PROVIDER_ID = JSON.parse(AWS_COGNITO_CUSTOM_PROVIDER).id;
+const AWS_COGNITO_CUSTOM_PROVIDER_LAMBDA = JSON.parse(AWS_COGNITO_CUSTOM_PROVIDER).lambda;
 const AWS = (window as any).AWS;
 
 function getCredentials(): CognitoIdentityCredentials {
@@ -111,34 +113,30 @@ export class CognitoWebClient extends CognitoClient {
         if (_.includes(current.services, AWS_COGNITO_CUSTOM_PROVIDER_ID)) {
             logger.info(() => `Nothing to do, since already signed in: ${AWS_COGNITO_CUSTOM_PROVIDER_ID}`);
             return current;
-        } else {
-            const p = getCredentials().params;
-            const logins = _.clone(p.Logins || {});
-            logins[AWS_COGNITO_CUSTOM_PROVIDER_ID] = userId;
-            
-            const params: ServerRequest = {
-                IdentityPoolId: AWS_COGNITO_POOL_ID,
-                IdentityId: _.isEmpty(p.Logins) ? null : p.IdentityId,
-                Logins: logins
-            }
-            
-            const ci = new AWS.CognitoIdentity();
-            const res = await aws_request<ServerResult>(ci.getOpenIdTokenForDeveloperIdentity(params));
-            
-            logins[AWS_COGNITO_CUSTOM_PROVIDER_ID] = res.Token;
-            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-                IdentityPoolId: AWS_COGNITO_POOL_ID,
-                IdentityId: res.IdentityId,
-                Logins: logins
-            });
-            return {
-                identityId: res.IdentityId,
-                services: _.keys(logins)
-            };
         }
+        const res = await AuthServer.add(userId);
+
+        const logins = _.clone(getCredentials().params.Logins || {});
+        logins[AWS_COGNITO_CUSTOM_PROVIDER_ID] = res.Token;
+
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: AWS_COGNITO_POOL_ID,
+            IdentityId: res.IdentityId,
+            Logins: logins
+        });
+        return {
+            identityId: res.IdentityId,
+            services: _.keys(logins)
+        };
     }
     
-    async removeCustomToken(): Promise<CognitoIdentity> {
+    async removeCustomToken(userId: string): Promise<CognitoIdentity> {
+        const current = await this.identity;
+        if (!_.includes(current.services, AWS_COGNITO_CUSTOM_PROVIDER_ID)) {
+            logger.info(() => `Nothing to do, since not signed in: ${AWS_COGNITO_CUSTOM_PROVIDER_ID}`);
+            return current;
+        }
+        await AuthServer.remove(userId);
         return this.removeToken(AWS_COGNITO_CUSTOM_PROVIDER_ID);
     }
 }
@@ -150,6 +148,55 @@ type ServerResult = {
 
 type ServerRequest = {
     IdentityPoolId: string,
-    IdentityId: string | null,
+    IdentityId?: string,
     Logins: { [key: string]: string }
+}
+
+type LambdaRequest = {
+    FunctionName: string,
+    Payload: Object,
+    ClientContext?: string, // Base64 encoded JSON
+    InvocationType?: "Event" | "RequestResponse" | "DryRun",
+    LogType?: "None" | "Tail",
+    Qualifier?: string
+}
+
+class AuthServer {
+    static async add(userId: string): Promise<ServerResult> {
+        const p = getCredentials().params;
+        const logins = _.clone(p.Logins || {});
+        logins[AWS_COGNITO_CUSTOM_PROVIDER_ID] = userId;
+
+        const params: ServerRequest = {
+            IdentityPoolId: AWS_COGNITO_POOL_ID,
+            Logins: logins
+        }
+        if (!_.isEmpty(p.Logins)) params.IdentityId = p.IdentityId;
+
+        return this.invoke<ServerResult>(params);
+    }
+
+    static async remove(userId: string): Promise<void> {
+        const p = getCredentials().params;
+
+        await this.invoke({
+            IdentityId: p.IdentityId,
+            IdentityPoolId: AWS_COGNITO_POOL_ID,
+            DeveloperProviderName: AWS_COGNITO_CUSTOM_PROVIDER_ID,
+            DeveloperUserIdentifier: userId
+        });
+    }
+
+    private static invoke<T>(payload): Promise<T> {
+        const splited = AWS_COGNITO_CUSTOM_PROVIDER_LAMBDA.split(':');
+
+        const params: LambdaRequest = {
+            FunctionName: splited[0],
+            Payload: payload
+        };
+        if (splited.length > 1) params.Qualifier = splited[1];
+
+        const lambda = new AWS.Lambda();
+        return aws_request<T>(lambda.invoke(params));
+    }
 }

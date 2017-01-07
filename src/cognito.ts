@@ -37,7 +37,7 @@ export class Cognito extends CognitoClient {
         return this.client.setCustomToken(userId);
     }
     
-    removeCustomToken(): Promise<CognitoIdentity> {
-        return this.client.removeCustomToken();
+    removeCustomToken(userId: string): Promise<CognitoIdentity> {
+        return this.client.removeCustomToken(userId);
     }
 }

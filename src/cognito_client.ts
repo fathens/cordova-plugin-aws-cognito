@@ -9,7 +9,7 @@ export abstract class CognitoClient {
     abstract setToken(service: string, token: string): Promise<CognitoIdentity>;
     abstract removeToken(service: string): Promise<CognitoIdentity>;
     abstract setCustomToken(userId: string): Promise<CognitoIdentity>;
-    abstract removeCustomToken(): Promise<CognitoIdentity>;
+    abstract removeCustomToken(userId: string): Promise<CognitoIdentity>;
 }
 
 export type CognitoIdentity = {
