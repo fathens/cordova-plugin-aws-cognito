@@ -1,12 +1,12 @@
 {
-  "name": "cordova-plugin-awscognito",
+  "name": "@cordova-plugin/aws-cognito",
   "version": "0.1.1",
   "description": "Cordova Plugin for AWS Cognito",
   "main": "dist/index.js",
   "typings": "dist/index",
   "dependencies": {
     "@types/lodash": "^4.14.45",
-    "cordova-plugin-aws": "github:fathens/Cordova-Plugin-AWS_Base",
+    "@cordova-plugin/aws-lambda": "github:fathens/Cordova-Plugin-AWS_Lambda",
     "lodash": "^4.17.3",
     "log4ts": "github:fathens/log4ts"
   },
