@@ -13,7 +13,7 @@
         <clobbers target="plugin.AWS.Cognito"/>
     </js-module>
 
-    <dependency id="org.fathens.cordova.plugin.aws.Base" url="https://github.com/fathens/Cordova-Plugin-AWS_Base.git" commit="master" />
+    <dependency id="org.fathens.cordova.plugin.aws.lambda" url="https://github.com/fathens/cordova-plugin-aws-lambda.git" commit="master" />
 
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
