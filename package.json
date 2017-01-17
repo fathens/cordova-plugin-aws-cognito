@@ -6,7 +6,7 @@
   "typings": "dist/index",
   "dependencies": {
     "@types/lodash": "^4.14.45",
-    "@cordova-plugin/aws-lambda": "github:fathens/Cordova-Plugin-AWS_Lambda",
+    "@cordova-plugin/aws-lambda": "github:fathens/cordova-plugin-aws-lambda",
     "lodash": "^4.17.3",
     "log4ts": "github:fathens/log4ts"
   },
@@ -27,6 +27,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fathens/Cordova-Plugin-AWS_Cognito.git"
+    "url": "https://github.com/fathens/cordova-plugin-aws-cognito.git"
   }
 }
