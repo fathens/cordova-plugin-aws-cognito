@@ -1,12 +1,12 @@
 {
-  "name": "cordova-plugin-awscognito",
-  "version": "0.1.1",
+  "name": "@cordova-plugin/aws-cognito",
+  "version": "0.2.0",
   "description": "Cordova Plugin for AWS Cognito",
   "main": "dist/index.js",
   "typings": "dist/index",
   "dependencies": {
     "@types/lodash": "^4.14.45",
-    "cordova-plugin-aws": "github:fathens/Cordova-Plugin-AWS_Base",
+    "@cordova-plugin/aws-lambda": "github:fathens/cordova-plugin-aws-lambda",
     "lodash": "^4.17.3",
     "log4ts": "github:fathens/log4ts"
   },
@@ -21,12 +21,12 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "postinstall": "tsc && _inject_pre AWS_COGNITO_POOL_ID"
+    "postinstall": "tsc"
   },
   "author": "f:athens",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fathens/Cordova-Plugin-AWS_Cognito.git"
+    "url": "https://github.com/fathens/cordova-plugin-aws-cognito.git"
   }
 }

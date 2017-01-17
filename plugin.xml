@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin id="org.fathens.cordova.plugin.aws.Cognito" version="0.1.1" xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<plugin id="org.fathens.cordova.plugin.aws.cognito" version="0.2.0" xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
     <name>Fabric</name>
     <description>Cordova Plugin for AWS Cognito</description>
     <license>MIT</license>
@@ -13,7 +13,7 @@
         <clobbers target="plugin.AWS.Cognito"/>
     </js-module>
 
-    <dependency id="org.fathens.cordova.plugin.aws.Base" url="https://github.com/fathens/Cordova-Plugin-AWS_Base.git" commit="master" />
+    <dependency id="org.fathens.cordova.plugin.aws.lambda" url="https://github.com/fathens/cordova-plugin-aws-lambda.git" commit="master" />
 
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
