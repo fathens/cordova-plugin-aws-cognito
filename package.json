@@ -21,7 +21,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "postinstall": "tsc && _inject_pre AWS_COGNITO_POOL_ID"
+    "postinstall": "tsc"
   },
   "author": "f:athens",
   "license": "MIT",
